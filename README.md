@@ -2,17 +2,9 @@
 
 [![Github CI][ci-badge]][ci-link]
 
-> **⚠️ Repository Archived**
->
-> As of version 0.2.5, this repository is no longer actively maintained and will be archived soon.
->
-> The code and Flèche technical report will remain available for reference, but no further updates, issues, or pull requests will be addressed.
->
-> We are currently looking for new maintainers.
-> Once a maintainer (or team) steps forward, we will link to them here.
->
-> If you’re interested in maintaining **rocq-lsp**, please stop by the discussion on this Zulip thread:
-> _[https://rocq-prover.zulipchat.com/#narrow/channel/329642-rocq-lsp/topic/Release.200.2E2.2E5]_
+This is a fork that adds coqdoc strings on hover.
+
+To install, run `opam pin add coq-lsp https://github.com/tchajed/rocq-lsp.git#docstring-hover-9.2` (for Rocq 9.2) or `#docstring-hover-9.1` (for Rocq 9.1).
 
 `rocq-lsp` is a [Language Server](https://microsoft.github.io/language-server-protocol/) for the [Rocq Prover](https://rocq-prover.org/). It provides a single server that implements:
 
@@ -23,7 +15,7 @@
 - the [MCP](https://modelcontextprotocol.io/) protocol (upcoming), an open
   protocol that standardizes how applications provide context to LLMs
 
-**☕ Try it online ☕**:  https://github.dev/ejgallego/hello-rocq
+**☕ Try it online ☕**:  <https://github.dev/ejgallego/hello-rocq>
 
 **Key [features](#Features)** of `rocq-lsp` are: continuous, incremental document
 checking, real-time interruptions and limits, programmable error recovery,
@@ -75,12 +67,13 @@ You can cite Rocq-lsp technical report and code repository as follows:
 
 **Quick Install**:
 
-  - **🐧 Linux / 🍎 macOs / 🪟 Windows:**
+- **🐧 Linux / 🍎 macOs / 🪟 Windows:**
+
 ```
-$ opam install coq-lsp && code --install-extension ejgallego.coq-lsp
+opam install coq-lsp && code --install-extension ejgallego.coq-lsp
 ```
 
-  - **🦄 Emacs**:
+- **🦄 Emacs**:
 
 ```elisp
  (use-package rocq-mode
@@ -92,7 +85,7 @@ $ opam install coq-lsp && code --install-extension ejgallego.coq-lsp
     (rocq-mode . rocq-auto-goals-at-point-mode))
 ```
 
-  - **🪟 Windows:** (alternative method)
+- **🪟 Windows:** (alternative method)
 
     Download the [Rocq Platform installer](#-server)
 
@@ -271,7 +264,7 @@ validation UI, as well as by other Rocq projects such as jsCoq.
 Moreover, we are strongly based on standards, aiming for the least possible
 extensions.
 
-### 🌐 Web Native!
+### 🌐 Web Native
 
 `rocq-lsp` has been designed from the ground up to fully run inside your web
 browser seamlessly; our sister project, [jsCoq](https://github.com/jscoq/jscoq)
@@ -281,7 +274,7 @@ will use it by default.
 `rocq-lsp` provides an exciting new array of opportunities for jsCoq, lifting
 some limitations we inherited from Rocq's lack of web native support.
 
-### 🔎 A Platform for Research!
+### 🔎 A Platform for Research
 
 A key `rocq-lsp` goal is to serve as central platform for researchers in
 Human-Computer-Interaction, Machine Learning, and Software Engineering willing
@@ -319,28 +312,30 @@ guide](./CONTRIBUTING.md)
 ### 🏓 Server
 
 - **opam** (OSX/Linux):
+
   ```
   opam install coq-lsp
   ```
+
 - **Nix**:
   - In nixpkgs: [coqPackages.coq-lsp](https://github.com/NixOS/nixpkgs/tree/master/pkgs/development/coq-modules/coq-lsp)
   - The `rocq-lsp` server is automatically put in scope when running `nix-shell` in a
     project using the [Rocq Nix Toolbox](https://github.com/rocq-community/coq-nix-toolbox)
     (added to the toolbox Oct 10th 2023).
   - An example of a `flake` that uses `rocq-lsp` in a development environment is here
-     https://github.com/HoTT/Coq-HoTT/blob/master/flake.nix .
+     <https://github.com/HoTT/Coq-HoTT/blob/master/flake.nix> .
 - **Windows**:
   Experimental Windows installers based on the [Rocq
-  Platform](https://github.com/rocq-prover/platform) are available at https://www.irif.fr/~gallego/coq-lsp/
+  Platform](https://github.com/rocq-prover/platform) are available at <https://www.irif.fr/~gallego/coq-lsp/>
 
   This provides a Windows native binary that can be executed from VSCode
   normally. As of today a bit of configuration is still needed:
   - In VSCode, set the `Coq-lsp: Path` to:
-    + `C:\Coq-Platform~8.20-lsp\bin\coq-lsp.exe`
+    - `C:\Coq-Platform~8.20-lsp\bin\coq-lsp.exe`
   - In VSCode, set the `Coq-lsp: Args` to:
-    + `--coqlib=C:\Coq-Platform~8.20-lsp\lib\coq\`
-    + `--coqcorelib=C:\Coq-Platform~8.20-lsp\lib\coq-core\`
-    + `--ocamlpath=C:\Coq-Platform~8.20-lsp\lib\`
+    - `--coqlib=C:\Coq-Platform~8.20-lsp\lib\coq\`
+    - `--coqcorelib=C:\Coq-Platform~8.20-lsp\lib\coq-core\`
+    - `--ocamlpath=C:\Coq-Platform~8.20-lsp\lib\`
   - Replace `C:\Coq-Platform~8.20-lsp\` by the path you have installed Rocq above as needed
   - Note that the installers are unsigned (for now), so you'll have to click on
     "More info" then "Run anyway" inside the "Windows Protected your PC" dialog
@@ -351,24 +346,24 @@ guide](./CONTRIBUTING.md)
 
 ### 🫐 Visual Studio Code
 
-- Official Marketplace: https://marketplace.visualstudio.com/items?itemName=ejgallego.coq-lsp
-- Open VSX: https://open-vsx.org/extension/ejgallego/coq-lsp
+- Official Marketplace: <https://marketplace.visualstudio.com/items?itemName=ejgallego.coq-lsp>
+- Open VSX: <https://open-vsx.org/extension/ejgallego/coq-lsp>
 
 ### 🦄 Emacs
 
-The official Rocq Emacs mode is https://codeberg.org/jpoiret/rocq-mode.el ,
+The official Rocq Emacs mode is <https://codeberg.org/jpoiret/rocq-mode.el> ,
 maintained by Josselin Poiret with contributions by Arthur Azevedo de Amorim.
 
 ### ✅ Vim
 
 - Experimental [CoqTail](https://github.com/whonore/Coqtail) support by Wolf Honore:
-  https://github.com/whonore/Coqtail/pull/323
+  <https://github.com/whonore/Coqtail/pull/323>
 
-  See it in action https://asciinema.org/a/mvzqHOHfmWB2rvwEIKFjuaRIu
+  See it in action <https://asciinema.org/a/mvzqHOHfmWB2rvwEIKFjuaRIu>
 
 ### 🩱 Neovim
 
-- Experimental client by Jaehwang Jung: https://github.com/tomtomjhj/coq-lsp.nvim
+- Experimental client by Jaehwang Jung: <https://github.com/tomtomjhj/coq-lsp.nvim>
 
 ### 🐍 Python
 
