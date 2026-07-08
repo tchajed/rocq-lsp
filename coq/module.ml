@@ -48,6 +48,38 @@ let offset_to_range source (bp, ep) =
   let end_ = Lang.Point.{ line = eline; character = echar; offset = ep } in
   Lang.Range.{ start; end_ }
 
+let with_info { vo; _ } name ~f =
+  let glob = Filename.remove_extension vo ^ ".glob" in
+  match Glob.open_file glob with
+  | Error err -> Error err
+  | Ok g -> Ok (Option.map f (Glob.get_info g name))
+
+let base_name name =
+  match String.rindex_opt name '.' with
+  | Some i -> String.sub name (i + 1) (String.length name - i - 1)
+  | None -> name
+
+(* Check the definition is really at [offset]; guards against a stale .glob
+   file whose offsets don't match the current source *)
+let check_id text offset id =
+  let n = String.length id in
+  offset >= 0
+  && offset + n <= String.length text
+  && String.equal (String.sub text offset n) id
+
+let docstring mod_ name =
+  let f { Glob.Info.offset = bp, _; _ } =
+    let text =
+      Compat.Ocaml_414.In_channel.(with_open_text mod_.source input_all)
+    in
+    if check_id text bp (base_name name) then Docstring.find ~text ~offset:bp
+    else None
+  in
+  match with_info mod_ name ~f with
+  | Error err -> Error err
+  | Ok (Some doc) -> Ok doc
+  | Ok None -> Ok None
+
 let find { vo; source; _ } name =
   let glob = Filename.remove_extension vo ^ ".glob" in
   match Glob.open_file glob with

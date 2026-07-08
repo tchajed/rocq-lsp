@@ -378,38 +378,50 @@ module Comment_info = struct
 end
 
 module Documentation : HoverProvider = struct
-  let extract s =
-    let r = Str.regexp ({|(\*\*?[ ]*\(\(.\||} ^ "\n" ^ {|\)*\)[ ]*\*)|}) in
-    (* "**[Docstring]**: \n" ^ *)
-    Str.replace_first r {|\1|} s
-
-  let extract lines line num =
-    let ll = List.init num (fun idx -> lines.(line - (num - idx))) in
-    String.concat "\n" ll |> extract
-
-  (* TODO: Stop when in node *)
-  let guess_start_line lines line =
-    let limit = 20 in
-    let rec back cur =
-      if cur > limit then None
-      else if CString.is_prefix "(*" lines.(line - cur) then Some cur
-      else back (cur + 1)
-    in
-    back 1
-
-  let process ~(contents : Contents.t) prev { Lang.Range.start; _ } =
-    (* XXX: Fix to use prev instead of the current hack *)
-    let _end_ = prev in
-    let { Lang.Point.line; _ } = start in
-    let lines = contents.lines in
-    Option.map (extract lines line) (guess_start_line lines line)
-
-  let h ~token:_ ~doc ~point ~node:_ =
-    let ( let* ) = Option.bind in
+  (* Definitions in the current document: find the docstring in the in-memory
+     contents, which may be fresher than what's on disk *)
+  let from_toc ~(doc : Doc.t) id =
     let { Doc.toc; contents; _ } = doc in
-    let* id_at_point = Rq_common.get_id_at_point ~contents ~point in
-    let* node = Doc.SM.find_opt id_at_point toc in
-    process ~contents node.prev node.range
+    Option.bind (Doc.SM.find_opt id toc) (fun node ->
+        let offset = node.range.start.offset in
+        Coq.Docstring.find ~text:contents.text ~offset)
+
+  (* Definitions elsewhere: resolve the global reference and extract the
+     docstring from its source file, located via the .glob file *)
+  let find_in dp name =
+    match Coq.Module.make dp with
+    | Error _ -> None
+    | Ok mod_ -> (
+      match Coq.Module.docstring mod_ name with
+      | Ok doc -> doc
+      | Error _ -> None)
+
+  let from_global id =
+    let qid = Libnames.qualid_of_string id in
+    match (try Some (Nametab.locate_extended qid) with Not_found -> None) with
+    | Some (TrueGlobal (ConstRef cr)) ->
+      let dp = Names.Constant.modpath cr |> Names.ModPath.dp in
+      find_in dp (Names.Constant.to_string cr)
+    | Some (TrueGlobal (IndRef (ind, _idx))) ->
+      let dp = Names.MutInd.modpath ind |> Names.ModPath.dp in
+      find_in dp (Names.MutInd.to_string ind)
+    | Some (TrueGlobal (VarRef _ | ConstructRef _)) | Some (Abbrev _) | None ->
+      None
+
+  let h ~token ~(doc : Doc.t) ~point ~node =
+    let ( let* ) = Option.bind in
+    let* id = Rq_common.get_id_at_point ~contents:doc.contents ~point in
+    let* docstring =
+      match from_toc ~doc id with
+      | Some _ as doc -> doc
+      | None -> (
+        let* node = node in
+        let st = Doc.Node.state node in
+        match Coq.State.in_state ~token ~st ~f:from_global id with
+        | Coq.Protect.{ E.r = R.Completed (Ok doc); feedback = _ } -> doc
+        | _ -> None)
+    in
+    Some (Coq.Docstring.to_markdown docstring)
 
   let h ~token ~doc ~point ~node =
     if !Config.v.show_doc_on_hover then h ~token ~doc ~point ~node else None
