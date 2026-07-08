@@ -5,19 +5,16 @@
 (* Copyright 2025      CNRS                     -- LGPL 2.1+ / GPL3+     *)
 (* Written by: Emilio J. Gallego Arias & coq-lsp contributors            *)
 (*************************************************************************)
-(* Rocq Language Server Protocol: Rocq module API                        *)
+(* Rocq Language Server Protocol: Docstring extraction                   *)
 (*************************************************************************)
 
-type t
+(** [find ~text ~offset] returns the contents of the coqdoc comment
+    [(** ... *)] preceding the definition at byte offset [offset] in [text],
+    delimiters stripped. The comment must be attached to the definition: only
+    whitespace, plain comments, and the (unterminated) start of the
+    definition's own sentence may separate them. *)
+val find : text:string -> offset:int -> string option
 
-(* Lookup module as needed *)
-val make : Names.DirPath.t -> (t, Loadpath.Error.t) Result.t
-val uri : t -> Lang.LUri.File.t
-val source : t -> string
-val find : t -> string -> (Lang.Range.t option, string) Result.t
-
-(** [docstring mod_ name] returns the coqdoc comment attached to the
-    definition of [name] in the module's source file, if any. [name] is a
-    fully-qualified name as found in .glob files, for example
-    [Stdlib.Lists.List.map]. *)
-val docstring : t -> string -> (string option, string) Result.t
+(** Translate coqdoc markup to markdown; for now only inline code [[id]] to
+    backquotes. *)
+val to_markdown : string -> string
