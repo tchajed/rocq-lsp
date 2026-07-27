@@ -44,8 +44,8 @@ depends: [
   "ocamlfind" { >= "1.9.8" }
 
   # [release branch] Uncomment
-  # "rocq-core"          { >= "9.2" < "9.3"  }
-  # "rocq-stdlib"        { >= "9" & with-test }
+  "rocq-core"          { >= "9.2" < "9.3"  }
+  "rocq-stdlib"        { >= "9" & with-test }
 
   # [release branch] Remove
   "zarith" {>= "1.13"}
